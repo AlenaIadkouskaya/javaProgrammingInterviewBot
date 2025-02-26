@@ -1,3 +1,7 @@
+server:
+  port: 8071
 spring:
   application:
     name: javaProgrammingInterviewBot
+bot:
+  token: 8052462950:AAETUTSOFbFSUTl1NnDLvQz_eZsWk085HE8
