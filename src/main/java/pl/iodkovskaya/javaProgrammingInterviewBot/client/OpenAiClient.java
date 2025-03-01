@@ -4,15 +4,20 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import pl.iodkovskaya.javaProgrammingInterviewBot.dto.GptRequest;
 import pl.iodkovskaya.javaProgrammingInterviewBot.dto.GptResponse;
+import pl.iodkovskaya.javaProgrammingInterviewBot.dto.Transcription;
 
+import java.io.File;
 import java.util.List;
 import java.util.stream.DoubleStream;
 
@@ -71,5 +76,27 @@ public class OpenAiClient {
             throw new IllegalStateException("There's an error when parsing JSON response from GPT", e);
         }
         return responseBody.getChoices().get(0).getMessage().getContent();
+    }
+
+    public String transcribe(File audio) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + apiKey);
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        FileSystemResource fileResource = new FileSystemResource(audio);
+        body.add("file", fileResource);
+        body.add("model", voiceModel);
+        body.add("language", language);
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+        ResponseEntity<String> response = restTemplate.postForEntity(transcriptionApiUrl, requestEntity, String.class);
+        Transcription transcription;
+        try {
+            transcription = objectMapper.readValue(response.getBody(), Transcription.class);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("There was an error when converting JSON response to DTO", e);
+        }
+        return transcription.text();
     }
 }

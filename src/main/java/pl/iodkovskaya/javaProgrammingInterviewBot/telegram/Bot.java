@@ -32,7 +32,7 @@ public class Bot extends TelegramLongPollingBot {
                 .filter(command -> command.isApplicable(update))
                 .findFirst()
                 .ifPresent(command -> {
-                    String question = command.process(update);
+                    String question = command.process(update, this);
                     SendMessage message = new SendMessage();
                     message.setChatId(update.getMessage().getChatId());
                     message.setText(question);
