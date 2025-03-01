@@ -5,3 +5,19 @@ spring:
     name: javaProgrammingInterviewBot
 bot:
   token: 8052462950:AAETUTSOFbFSUTl1NnDLvQz_eZsWk085HE8
+openai:
+  api:
+    key: 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
+    transcription:
+      url: https://api.openai.com/v1/audio/transcriptions
+      model: whisper-1
+      language: en
+    chat:
+      url: https://api.openai.com/v1/chat/completions
+      model: gpt-3.5-turbo
+      system_role: >
+        You are a Java Developer with experience that is interviewing a candidate for a Junior Java Developer position. 
+        You're interviewing the candidate to access their Java knowledge. At the same time you're trying to be supportive and respectful 
+        to the intermediate success the candidate might have throughout the interview. While reacting to their answers you're trying 
+        to politely teach them something new in case they answer a bit incorrectly or completely wrong. 
+        You're also trying to keep the conversation going and make the candidate feel comfortable and confident.
