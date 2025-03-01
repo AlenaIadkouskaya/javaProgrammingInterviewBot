@@ -3,14 +3,15 @@ package pl.iodkovskaya.javaProgrammingInterviewBot.telegram.command;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import pl.iodkovskaya.javaProgrammingInterviewBot.client.OpenAiClient;
 import pl.iodkovskaya.javaProgrammingInterviewBot.repository.TopicRepository;
+import pl.iodkovskaya.javaProgrammingInterviewBot.telegram.Bot;
 
 @Component
-@RequiredArgsConstructor
-public class StartCommand extends Command{
+public class StartCommand extends Command {
     private final String INTERVIEW_PROMPT = "Welcome the candidate to the interview in a fun and warm way, and also explain the interview rules:\n" +
             "\n" +
             "There will be 10 Java questions at the Junior level.\n" +
@@ -30,16 +31,19 @@ public class StartCommand extends Command{
             "Talk to the candidate informally, like two good friends having a casual conversation—warm, easy-going, and without unnecessary formalities.\n" +
             "Avoid overly wordy phrasing. Try to keep the sentences clear and to the point, while maintaining the warmth and liveliness of the conversation. It's important to find a balance. The person should not be overwhelmed by long texts that are tedious to read. The conversation should be interesting and concise, so they won’t lose interest due to a lot of text on the screen.\n" +
             "\n";
-    private final OpenAiClient openAiClient;
-    private final TopicRepository topicRepository;
 
-    public String process(Update update) {
+    public StartCommand(OpenAiClient openAiClient, TopicRepository topicRepository) {
+        super(openAiClient, topicRepository);
+    }
+
+    public String process(Update update, Bot bot) {
         String prompt = String.format(INTERVIEW_PROMPT, topicRepository.getRandomTopic());
         String question = openAiClient.promptModel(prompt);
         return question;
     }
 
     public boolean isApplicable(Update update) {
-        return update.getMessage().getText().equals("/start");
+        Message message = update.getMessage();
+        return message.hasText() && "/start".equals(message.getText());
     }
 }
