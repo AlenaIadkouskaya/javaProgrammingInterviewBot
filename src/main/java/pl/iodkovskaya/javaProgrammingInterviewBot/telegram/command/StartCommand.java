@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import pl.iodkovskaya.javaProgrammingInterviewBot.client.OpenAiClient;
+import pl.iodkovskaya.javaProgrammingInterviewBot.repository.QuestionRepository;
 import pl.iodkovskaya.javaProgrammingInterviewBot.repository.TopicRepository;
 import pl.iodkovskaya.javaProgrammingInterviewBot.telegram.Bot;
 
@@ -32,13 +33,15 @@ public class StartCommand extends Command {
             "Avoid overly wordy phrasing. Try to keep the sentences clear and to the point, while maintaining the warmth and liveliness of the conversation. It's important to find a balance. The person should not be overwhelmed by long texts that are tedious to read. The conversation should be interesting and concise, so they won’t lose interest due to a lot of text on the screen.\n" +
             "\n";
 
-    public StartCommand(OpenAiClient openAiClient, TopicRepository topicRepository) {
-        super(openAiClient, topicRepository);
+    public StartCommand(OpenAiClient openAiClient, TopicRepository topicRepository, QuestionRepository questionRepository) {
+        super(openAiClient, topicRepository, questionRepository);
     }
 
     public String process(Update update, Bot bot) {
         String prompt = String.format(INTERVIEW_PROMPT, topicRepository.getRandomTopic());
         String question = openAiClient.promptModel(prompt);
+        String userName = update.getMessage().getFrom().getUserName();
+        questionRepository.addQuestion(userName, question);
         return question;
     }
 
