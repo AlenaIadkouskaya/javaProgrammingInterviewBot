@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.Voice;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import pl.iodkovskaya.javaProgrammingInterviewBot.client.OpenAiClient;
+import pl.iodkovskaya.javaProgrammingInterviewBot.repository.QuestionRepository;
 import pl.iodkovskaya.javaProgrammingInterviewBot.repository.TopicRepository;
 import pl.iodkovskaya.javaProgrammingInterviewBot.telegram.Bot;
 
@@ -33,14 +34,18 @@ public class VoiceCommand extends Command {
             Avoid overly wordy phrasing. Try to keep sentences clear and to the point while maintaining the warmth and liveliness of the conversation. Find the right balance. However, the person shouldn’t get an enormous text that would make them lazy to read. The conversation should be interesting but concise, so they don’t lose the desire to continue because of the large amount of text on the screen.
             """;
 
-    public VoiceCommand(OpenAiClient openAiClient, TopicRepository topicRepository) {
-        super(openAiClient, topicRepository);
+    public VoiceCommand(OpenAiClient openAiClient, TopicRepository topicRepository, QuestionRepository questionRepository) {
+        super(openAiClient, topicRepository, questionRepository);
     }
 
     @Override
     public String process(Update update, Bot bot) {
         String answer = transcribeVoiceAnswer(update, bot);
-        return openAiClient.promptModel(String.format(QUESTION_PROMPT, topicRepository.getRandomTopic()));
+        String userName = update.getMessage().getFrom().getUserName();
+        questionRepository.addAnswer(userName, answer);
+        String question = openAiClient.promptModel(String.format(QUESTION_PROMPT, topicRepository.getRandomTopic()));
+        questionRepository.addQuestion(userName, question);
+        return question;
     }
 
     @Override
