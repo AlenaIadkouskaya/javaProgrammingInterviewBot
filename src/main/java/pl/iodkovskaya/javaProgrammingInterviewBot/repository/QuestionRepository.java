@@ -29,4 +29,10 @@ public class QuestionRepository {
             throw new IllegalStateException("There is no interview session starter for user " + userName);
         }
     }
+    public int getUserQuestions(String userName) {
+        return userQuestions.get(userName).size();
+    }
+    public Deque<Question> finishInterview(String userName) {
+        return userQuestions.remove(userName);
+    }
 }
