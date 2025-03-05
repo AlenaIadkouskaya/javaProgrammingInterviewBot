@@ -21,3 +21,6 @@ openai:
         to the intermediate success the candidate might have throughout the interview. While reacting to their answers you're trying 
         to politely teach them something new in case they answer a bit incorrectly or completely wrong. 
         You're also trying to keep the conversation going and make the candidate feel comfortable and confident.
+
+interview:
+  max-questions: 10
